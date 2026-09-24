@@ -1,0 +1,11 @@
+name: Feature idea
+description: Suggest something new or better
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like SimpleCMS to do?
+      description: Tell me the problem you're trying to solve, not just the feature.
+    validations:
+      required: true
