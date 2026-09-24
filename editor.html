@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="site-title">SimpleCMS | Simply simple.</title>
+    <meta name="description" id="meta-description" content="SimpleCMS - Simple Local CMS from the Browser">
+    <link rel="icon" id="editor-favicon" href="icons/icon32.png">
+    <style id="theme-styles">
+        /* Bundled fonts (also copied into the exported site's fonts/ folder) */
+        @font-face { font-family: 'Inter'; font-weight: 400; font-display: swap; src: url('fonts/inter-latin-400-normal.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-weight: 600; font-display: swap; src: url('fonts/inter-latin-600-normal.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-weight: 700; font-display: swap; src: url('fonts/inter-latin-700-normal.woff2') format('woff2'); }
+        @font-face { font-family: 'Playfair Display'; font-weight: 700; font-display: swap; src: url('fonts/playfair-display-latin-700-normal.woff2') format('woff2'); }
+
+        :root {
+            --primary: #2d5a27;
+            --secondary: #4a4a4a;
+            --accent: #f9fbf9;
+            --text: #333;
+            --white: #ffffff;
+            --section-spacing: 100px;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--accent);
+        }
+
+        nav {
+            background: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            height: 60px;
+            z-index: 1000;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logo img {
+            height: 45px;
+            vertical-align: middle;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--secondary);
+            font-weight: 600;
+            text-transform: capitalize;
+            transition: color 0.2s;
+        }
+
+        section {
+            padding: var(--section-spacing) 10%;
+            position: relative;
+            background: white;
+            border-bottom: 1px solid #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        .hidden-item {
+            opacity: 0.3;
+            background: #eee !important;
+            border: 1px dashed #999;
+        }
+
+        .widget-wrapper {
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+
+        .edit-mode .widget-wrapper {
+            border: 1px dashed #ccc;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-form {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        .contact-form button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* Admin UI */
+        #admin-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 340px;
+            height: 100vh;
+            --panel-alpha: 1;
+            background: rgba(17, 17, 17, var(--panel-alpha));
+            color: #eee;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            z-index: 9999;
+            transform: translateX(-100%);
+            transition: 0.3s;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+
+        #admin-panel.open {
+            transform: translateX(0);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .section-block {
+            background: rgba(255, 255, 255, 0.07);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .widget-row {
+            background: rgba(255, 255, 255, 0.09);
+            margin-top: 6px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .admin-btn {
+            padding: 5px 10px;
+            font-size: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background: #444;
+            color: white;
+        }
+
+        .btn-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .primary-btn {
+            background: var(--primary);
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        /* Builder tab: pinned to the left edge, rides along with the panel */
+        #toggle-admin {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 7px;
+            border: none;
+            border-radius: 0 10px 10px 0;
+            background: #333;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.25);
+            transition: left 0.3s, background 0.2s;
+        }
+
+        #toggle-admin:hover,
+        body.admin-open #toggle-admin {
+            background: var(--primary);
+        }
+
+        #toggle-admin .tab-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            letter-spacing: 0.05em;
+        }
+
+        #toggle-admin:focus-visible {
+            outline: 2px solid #fff;
+            outline-offset: -4px;
+        }
+
+        body.admin-open #toggle-admin {
+            left: 340px;
+        }
+
+        /* Panel view options */
+        .panel-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .panel-opt input[type="range"] {
+            flex: 1;
+        }
+
+        /* Docked: page slides over so the panel covers nothing (wide screens only) */
+        @media (min-width: 900px) {
+            body.admin-open.admin-docked {
+                padding-left: 340px;
+            }
+        }
+
+        body.admin-docked,
+        body.admin-open {
+            transition: padding-left 0.3s;
+        }
+
+        footer {
+            background: var(--secondary);
+            color: white;
+            text-align: center;
+            padding: 150px 40px;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .data-table th {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Gallery editing */
+        .gallery-item {
+            position: relative;
+        }
+
+        .edit-mode .gallery-item img {
+            cursor: pointer;
+        }
+
+        .item-del {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, 0.65);
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Preview mode: show the page the way visitors will see it */
+        body:not(.edit-mode) .edit-only {
+            display: none !important;
+        }
+
+        body:not(.edit-mode) .hidden-item {
+            display: none;
+        }
+
+        /* HTML widget editor */
+        #html-editor:not([hidden]) {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .html-editor-box {
+            background: #1b1b1b;
+            color: #eee;
+            padding: 16px;
+            border-radius: 8px;
+            width: min(800px, 92vw);
+        }
+
+        #html-editor-text {
+            width: 100%;
+            height: 50vh;
+            box-sizing: border-box;
+            margin-top: 10px;
+            background: #111;
+            color: #eee;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        /* Small screens */
+        @media (max-width: 700px) {
+            nav {
+                height: auto;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .nav-links {
+                gap: 1.25rem;
+                max-width: 100%;
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 4px;
+            }
+
+            section {
+                padding: 60px 6%;
+            }
+        }
+
+        #save-status {
+            display: block;
+            margin-top: 8px;
+            min-height: 1.2em;
+            color: #9a9a9a;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body class="edit-mode">
+
+    <button id="toggle-admin" data-action="toggleAdmin" title="Builder menu (Esc closes)" aria-expanded="false" aria-controls="admin-panel"><span aria-hidden="true">⚙️</span><span class="tab-label">Builder</span></button>
+
+    <div id="admin-panel">
+        <h2 style="border-bottom: 2px solid var(--primary); padding-bottom:10px;">SimpleCMS Admin</h2>
+
+        <div class="section-block">
+            <small>PANEL VIEW</small>
+            <label class="panel-opt">Opacity
+                <input type="range" id="panel-alpha" min="35" max="100" step="5" value="100">
+                <span id="panel-alpha-val" style="width:3em; text-align:right;">100%</span>
+            </label>
+            <label class="panel-opt"><input type="checkbox" id="panel-dock"> Dock beside the page (wide screens)</label>
+        </div>
+
+        <div class="section-block">
+            <small>GLOBAL THEME & SEO</small>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top:8px;">
+                <input type="color" id="color-picker" value="#2d5a27">
+                <select id="font-picker">
+                    <option value="'Inter', sans-serif">Modern</option>
+                    <option value="'Playfair Display', serif">Classic</option>
+                    <option value="'Courier New', monospace">Technical</option>
+                </select>
+            </div>
+            <div style="margin-top:10px; display: flex; gap: 5px;">
+                <button class="admin-btn" data-action="uploadLogo">Img Logo</button>
+                <button class="admin-btn" style="background:#8e2a2a" data-action="resetLogo">Reset Text</button>
+            </div>
+            <div style="margin-top:15px;">
+                <input type="text" id="seo-title-input" placeholder="Browser Title" class="admin-btn"
+                    style="width:100%; text-align:left; background:#333;">
+                <textarea id="seo-desc-input" placeholder="SEO Description" class="admin-btn"
+                    style="width:100%; text-align:left; background:#333; margin-top:5px;"></textarea>
+            </div>
+        </div>
+
+        <div id="hierarchy-manager"></div>
+        <button class="admin-btn primary-btn" data-action="addSection">+ Add New Section</button>
+        <div class="btn-row" style="margin-top:20px;">
+            <button class="admin-btn" style="flex:1; padding:10px;" title="Open a project file, an exported .zip or index.html, or an editor saved from the single-file version" data-action="importSite">📂 Open</button>
+            <button class="admin-btn" style="flex:1; padding:10px;" title="Download your work as a project file you can open again later (a backup of the autosave)" data-action="saveProject">📝 Save Project</button>
+            <button class="admin-btn" style="flex:1; padding:10px; background:#8e2a2a;" title="Start over with the starter page" data-action="resetSite">↺ Reset</button>
+        </div>
+        <button id="preview-btn" class="admin-btn" style="width:100%; margin-top:8px; padding:10px;" data-action="togglePreview">👁 Preview</button>
+        <button class="admin-btn" style="background: #2196F3; width:100%; margin-top:8px; padding:12px;" data-action="exportFinal">💾 Export Site (.zip)</button>
+        <small id="save-status" aria-live="polite"></small>
+    </div>
+
+    <nav>
+        <a href="#home" class="logo" id="logo-target" contenteditable="true">SimpleCMS</a>
+        <ul class="nav-links" id="main-nav"></ul>
+    </nav>
+
+    <div id="main-canvas">
+        <section id="home">
+            <div class="widget-wrapper" id="hero-main">
+                <h1 contenteditable="true" style="text-align:center; font-size: 4rem;">SimpleCMS, simply simple.</h1>
+                <p contenteditable="true" style="text-align:center; max-width: 700px; margin: 0 auto;">Laid back ready when you are.</p>
+            </div>
+        </section>
+    </div>
+
+    <footer style="background: var(--secondary); color: white; text-align: center;">
+        <p contenteditable="true">thisguy@simplecms | CITY, STATE</p>
+    </footer>
+
+    <div id="html-editor" class="edit-only" hidden>
+        <div class="html-editor-box">
+            <b>Edit HTML</b>
+            <textarea id="html-editor-text" spellcheck="false"></textarea>
+            <div class="btn-row" style="justify-content:flex-end;">
+                <button class="admin-btn" style="padding:8px 14px;" data-action="htmlCancel">Cancel</button>
+                <button class="admin-btn" style="padding:8px 14px; background:var(--primary);" data-action="htmlApply">Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Editor-only scripts: both are removed from the exported site -->
+    <script id="jszip-lib" src="lib/jszip.min.js"></script>
+    <script id="admin-script" src="editor.js"></script>
+</body>
+
+</html>
