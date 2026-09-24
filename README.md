@@ -2,8 +2,7 @@
 
 **Simply simple.** Build a one-page website right in your browser, then export it as a zip that's ready to put online. No account, no server, nothing uploaded.
 
-<img width="1280" height="800" alt="store_screenshot_1280x800" src="https://github.com/user-attachments/assets/4c12ff67-1992-482c-bb0d-c6c861938280" />
-
+<img width="1920" height="985" alt="simplycms_preview1" src="https://github.com/user-attachments/assets/62479727-507d-41f7-accb-db42ef63501e" />
 
  [Privacy policy](PRIVACY.md)
 
